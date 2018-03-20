@@ -59,6 +59,8 @@ def _knn_flann(X, num_neighbors, dist_type, order):
     # seems to work best).
     NN, D = flann.nn(X, X, num_neighbors=(num_neighbors + 1), 
                      algorithm='kdtree')
+    if dist_type == 'euclidean': # flann returns squared distances
+        return NN, np.sqrt(D)
     return NN, D
 
 def _radius_sp_kdtree(X, epsilon, dist_type, order=0):
@@ -117,6 +119,8 @@ def _radius_flann(X, epsilon, dist_type, order=0):
         D.append(d)
         NN.append(nn)
     flann.delete_index()
+    if dist_type == 'euclidean': # flann returns squared distances
+        return NN, np.sqrt(D)
     return NN, D
 
 def center_input(X, N):
