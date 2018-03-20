@@ -89,8 +89,9 @@ def _radius_sp_pdist(X, epsilon, dist_type, order):
     NN = []
     for k in range(N):
         v = pd[k, pdf[k, :]]
+        d = pd[k, :].argsort()
         # use the same conventions as in scipy.distance.kdtree
-        NN.append(v.argsort())
+        NN.append(d[0:len(v)])
         D.append(np.sort(v))
     
     return NN, D
@@ -106,16 +107,11 @@ def _radius_flann(X, epsilon, dist_type, order=0):
     pfl.set_distance_type(dist_type, order=order)
     flann = pfl.FLANN()
     flann.build_index(X)
+    
     D = []
     NN = []
     for k in range(N):
-        nn,d = flann.nn_radius(X[N, :], epsilon)
-        D.append(d)
-        NN.append(nn)
-    D = []
-    NN = []
-    for k in range(N):
-        nn, d = flann.nn_radius(X[k, :], epsilon)
+        nn, d = flann.nn_radius(X[k, :], epsilon*epsilon)
         D.append(d)
         NN.append(nn)
     flann.delete_index()
